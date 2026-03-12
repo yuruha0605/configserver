@@ -1,0 +1,45 @@
+# git repo(msa_config.git) 설정 변경이 되었을 때 config Server가 비동기 event 발행(RabbitMQ)
+# Config Server(cloud bus 이벤트 발행자)      : RabbitMQ 설정
+# 각 micro service (cloud bus event 소비자)  : RabbitMQ 설정
+# Message 발행 ( Producer ) -> Routing ( Exchange ) -> Message 저장 ( Queue ) -> Message 소비 ( Consumer )
+# Producer는 직접적으로 Message Queue를 모르므로, Exchange 로만 Message를 보내고 이를 Routing이 저장
+# RabbitMQ - docker 설치
+# docker run -d --name rabitmq-container -p 5672:5672 rabbitmq:3-management
+# http://localhost:5672
+
+
+spring:
+  application:
+    name: configserver
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/yuruha0605/spring_cloud_configs.git
+          
+          # Config Server 기동 시, git repo를 미리 clone
+          clone-on-start: true
+          
+          # branch 지정
+          # repo -> private일 경우 : 
+          # username: github 계정
+          # password: github token
+          default-label: main
+
+    # MSA 전체에 Event를 전파하는 Message Bus  
+    # /busrefresh 호출 시 : rabbitMQ event 발생 -> 모든 service가 동시에 설정 정보를 갱신
+    bus:
+      enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: busrefresh, health
