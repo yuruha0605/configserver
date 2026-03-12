@@ -13,7 +13,7 @@ spring:
     name: configserver
 
   rabbitmq:
-    host: localhost
+    host: rabbitmq-service
     port: 5672
     username: guest
     password: guest
@@ -22,19 +22,9 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/yuruha0605/spring_cloud_configs.git
-          
-          # Config Server 기동 시, git repo를 미리 clone
+          uri: https://github.com/yuruha0605/msa_configs.git
           clone-on-start: true
-          
-          # branch 지정
-          # repo -> private일 경우 : 
-          # username: github 계정
-          # password: github token
           default-label: main
-
-    # MSA 전체에 Event를 전파하는 Message Bus  
-    # /busrefresh 호출 시 : rabbitMQ event 발생 -> 모든 service가 동시에 설정 정보를 갱신
     bus:
       enabled: true
 
